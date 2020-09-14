@@ -1,0 +1,5 @@
+name: Hub
+version: ${project.version}
+main: com.thilojaeggi.hub.Main
+commands:
+  hub:
