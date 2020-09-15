@@ -3,3 +3,6 @@ version: ${project.version}
 main: com.thilojaeggi.hub.Main
 commands:
   hub:
+    description: Geht zur Lobby
+    usage: /<command>
+    aliases: [lobby]
