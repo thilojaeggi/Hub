@@ -6,3 +6,11 @@ commands:
     description: Geht zur Lobby
     usage: /<command>
     aliases: [lobby]
+  msg:
+    description: Nachrichten Netzwerkweit schicken
+    usage: /<command>
+    aliases: [tell]
+  reply:
+    description: Nachrichten Netzwerkweit schicken
+    usage: /<command>
+    aliases: [r]

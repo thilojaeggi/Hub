@@ -17,7 +17,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class HubCommand extends Command {
-    Configuration configuration;
+    Configuration configuration, lastreceivers;
     public HubCommand() {
         super("hub", "hub.use", "lobby");
     }
@@ -25,9 +25,10 @@ public class HubCommand extends Command {
     @Override
     public void execute(CommandSender sender, String[] args) {
         Plugin plugin = Main.plugin;
-        File file = new File(plugin.getDataFolder(), "config.yml");
+        File Config = new File(plugin.getDataFolder(), "config.yml");
+        File LastReceivers = new File(plugin.getDataFolder(), "lastreceivers.yml");
         try {
-            configuration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
+            configuration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(Config);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,25 +1,27 @@
 package com.thilojaeggi.hub;
 
-import com.google.common.io.ByteStreams;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public final class Main extends Plugin {
     public static Plugin plugin;
-    Configuration Config;
+    private static Main instance;
+    Configuration Config, lastreceivers;
     @Override
     public void onEnable() {
         getProxy().getPluginManager().registerCommand(this, new HubCommand());
+        getProxy().getPluginManager().registerCommand(this, new MsgCommand());
+        getProxy().getPluginManager().registerCommand(this, new ReplyCommand());
+
+        instance = this;
         plugin = this;
         createFolder();
 
@@ -38,7 +40,14 @@ public final class Main extends Plugin {
         }
 
         File ConfigFile = new File(getDataFolder(), "config.yml");
-
+        File LastReceivers = new File(getDataFolder(), "lastreceivers.yml");
+        if (!LastReceivers.exists()){
+            try {
+                LastReceivers.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         if (!ConfigFile.exists()) {
             try {
                 ConfigFile.createNewFile();
@@ -51,6 +60,7 @@ public final class Main extends Plugin {
 
     private void loaderConfiguration() {
         try {
+            lastreceivers = ConfigurationProvider.getProvider(YamlConfiguration.class).load(new File(getDataFolder(), "lastreceivers.yml"));
             Config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(new File(getDataFolder(), "config.yml"));
             if (!Config.contains("hub")){
                 Config.set("hub", "lobby");
@@ -80,10 +90,16 @@ public final class Main extends Plugin {
         }
         return null;
     }
-
+    public void setLastreceivers(String receiver,String sender){
+        lastreceivers.set(receiver + "_lastmsgfrom", sender);
+    }
+    public String getLastreceiver(String receiver){
+        return lastreceivers.get(receiver+"_lastmsgfrom").toString();
+    }
     public void saveConfig() {
         if ((Config != null)) {
             try {
+                ConfigurationProvider.getProvider(YamlConfiguration.class).save(lastreceivers, new File(getDataFolder(), "lastreceivers.yml"));
                 ConfigurationProvider.getProvider(YamlConfiguration.class).save(Config, new File(getDataFolder(), "config.yml"));
             } catch (IOException e) {
                 e.printStackTrace();
@@ -91,15 +107,14 @@ public final class Main extends Plugin {
         }
 
     }
-
+    public static Main getInstance(){
+        return instance;
+    }
     public void reloadConfig() {
         loaderConfiguration();
     }
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-    }
-    public Plugin getInstance() {
-        return plugin;
     }
 }
